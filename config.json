@@ -1,6 +1,6 @@
 {
   "app_name": "IrisCms",
-  "port": "9000",
+  "port": "8080",
   "static_path": "/manage/static",
   "mode": "dev"
 }

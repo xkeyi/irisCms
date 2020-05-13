@@ -1,8 +1,15 @@
 package main
 
 import (
-	"code/irisCms/config"
 	"github.com/kataras/iris"
+	"code/irisCms/config"
+	"code/irisCms/controller"
+	"code/irisCms/datasource"
+	"code/irisCms/service"
+	//"github.com/kataras/iris/context"
+	"github.com/kataras/iris/mvc"
+	"github.com/kataras/iris/sessions"
+	"time"
 )
 
 /**
@@ -15,6 +22,7 @@ func main() {
 	configation(app)
 
 	// 路由设置
+	mvcHandle(app)
 
 	config := config.InitConfig()
 	addr := ":" + config.Port
@@ -44,6 +52,56 @@ func newApp() *iris.Application {
 	})
 
 	return app
+}
+
+/**
+ * MVC 架构模式处理
+ */
+func mvcHandle(app *iris.Application) {
+
+	//启用session
+	sessManager := sessions.New(sessions.Config{
+		Cookie:  "sessioncookie",
+		Expires: 24 * time.Hour,
+	})
+
+	engine := datasource.NewMysqlEngine()
+
+	//管理员模块功能
+	adminService := service.NewAdminService(engine)
+	admin := mvc.New(app.Party("/admin"))
+	admin.Register(
+		adminService,
+		sessManager.Start,
+	)
+	admin.Handle(new(controller.AdminController))
+
+	//用户功能模块
+	userService := service.NewUserService(engine)
+	user := mvc.New(app.Party("/v1/users"))
+	user.Register(
+		userService,
+		sessManager.Start,
+	)
+	user.Handle(new(controller.UserController))
+
+	//统计功能模块
+	statisService := service.NewStatisService(engine)
+	statis := mvc.New(app.Party("/statis/{model}/{date}/"))
+	statis.Register(
+		statisService,
+		sessManager.Start,
+	)
+	statis.Handle(new(controller.StatisController))
+
+	//订单模块
+	orderService := service.NewOrderService(engine)
+	order := mvc.New(app.Party("/bos/orders/"))
+	order.Register(
+		orderService,
+		sessManager.Start,
+	)
+	order.Handle(new(controller.OrderController)) //控制器
 }
 
 // 项目设置
