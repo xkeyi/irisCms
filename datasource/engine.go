@@ -1,17 +1,28 @@
 package datasource
 
 import (
+	"code/irisCms/config"
+	"code/irisCms/model"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
-	"code/irisCms/model"
 )
 
 /**
  * 实例化数据库引擎方法：mysql的数据引擎
  */
 func NewMysqlEngine() *xorm.Engine {
+	// 项目配置
+	cmsConfig := config.InitConfig()
+	if cmsConfig == nil {
+		return nil
+	}
+
+	database := cmsConfig.DataBase
+
+	// "root:root@/irisCms?charset=utf8"
+	dataSourceName := database.User + ":" + database.Pwd + "@tcp(" + database.Host + ")/" + database.Database + "?charset=utf8"
 	// 数据库引擎
-	engine, err := xorm.NewEngine("mysql", "root:root@/irisCms?charset=utf8")
+	engine, err := xorm.NewEngine(database.Drive, dataSourceName)
 	if err != nil {
 		panic(err.Error())
 	}

@@ -1,6 +1,21 @@
 {
-  "app_name": "IrisCms",
+  "app_name": "CmsProject",
   "port": "8080",
   "static_path": "/manage/static",
+  "data_base": {
+    "drive": "mysql",
+    "host": "127.0.0.1",
+    "port": "3306",
+    "user": "root",
+    "pwd": "root",
+    "database": "irisCms"
+  },
+  "redis": {
+    "net_work": "tcp",
+    "addr": "127.0.0.1",
+    "port": "6379",
+    "password": "",
+    "prefix": "qfCms_"
+  },
   "mode": "dev"
 }
